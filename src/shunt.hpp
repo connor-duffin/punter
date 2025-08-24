@@ -21,7 +21,7 @@ inline int precedence(char o) {
 } // namespace
 
 namespace shunt {
-inline std::string eval(std::string expr) {
+inline std::string parse(std::string expr) {
   // Parse expressions of integers e.g. 1 + 2 * 5 / 2
   // TODO: allow for functions
   // TODO: allow for decimal points

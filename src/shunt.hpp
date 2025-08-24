@@ -7,8 +7,8 @@
 #include <string>
 #include <vector>
 
-namespace shunt {
 // Does operator o1 have equal to or higher precedence than o2
+namespace {
 inline int precedence(char o) {
   if (o == '+' or o == '-') {
     return 4;
@@ -18,13 +18,14 @@ inline int precedence(char o) {
     return 1'000'000;
   }
 }
+} // namespace
 
-inline void eval(std::string expr) {
+namespace shunt {
+inline std::string eval(std::string expr) {
   // Parse expressions of integers e.g. 1 + 2 * 5 / 2
-  // TODO: check for bad characters
-  // TODO: allow for parens
-  // TODO: allow for decimal points
   // TODO: allow for functions
+  // TODO: allow for decimal points
+  // TODO: check for bad characters
   // TODO: allow for evaluating variables from the heap
   int n = expr.length();
   std::string out;
@@ -36,6 +37,28 @@ inline void eval(std::string expr) {
     // If it's a number, just push onto the output
     if (s >= '0' && s <= '9') {
       out += s;
+    } else if (s == '(') {
+      op_stack.push_back(s);
+    } else if (s == ')') {
+      if (op_stack.empty()) {
+        throw std::runtime_error("Unbalanced parentheses");
+      }
+
+      // While the back is not a parens, add stuff to the operator queue
+      char back = op_stack.back();
+      while (back != '(') {
+        out += back;
+
+        op_stack.pop_back();
+        back = op_stack.back();
+      }
+
+      // We *should* have an left parenthesis on the back
+      if (back == '(') {
+        op_stack.pop_back();
+      } else {
+        throw std::runtime_error("Unbalanced parentheses");
+      }
     } else if (s == '+' or s == '-' or s == '*' or s == '/') {
       // If the stack is empty, just push it straight on
       if (op_stack.empty()) {
@@ -61,6 +84,8 @@ inline void eval(std::string expr) {
     op_stack.pop_back();
   }
   std::cout << out << std::endl;
+
+  return out;
 }
 } // namespace shunt
 

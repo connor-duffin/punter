@@ -31,59 +31,85 @@ inline std::string parse(std::string expr) {
   std::string out;
   std::vector<char> op_stack;
 
-  for (int i = 0; i < n; ++i) {
-    char s = expr.at(i);
+  auto it = expr.begin();
+  char s_prev = ' ';
+  while (it != expr.end()) {
+    // Get the current character
+    char s = *it;
 
     // If it's a number, just push onto the output
-    if (s >= '0' && s <= '9') {
+    if ((s >= '0' && s <= '9')) {
       out += s;
-    } else if (s == '(') {
-      op_stack.push_back(s);
-    } else if (s == ')') {
-      if (op_stack.empty()) {
-        throw std::runtime_error("Unbalanced parentheses");
+    } else {
+      if (s_prev >= '0' && s_prev <= '9') {
+        // Add a space after a sequence of numbers
+        out += ' ';
       }
-
-      // While the back is not a parens, add stuff to the operator queue
-      char back = op_stack.back();
-      while (back != '(') {
-        out += back;
-
-        op_stack.pop_back();
-        back = op_stack.back();
-      }
-
-      // We *should* have an left parenthesis on the back
-      if (back == '(') {
-        op_stack.pop_back();
-      } else {
-        throw std::runtime_error("Unbalanced parentheses");
-      }
-    } else if (s == '+' or s == '-' or s == '*' or s == '/') {
-      // If the stack is empty, just push it straight on
-      if (op_stack.empty()) {
+      if (s == '(') {
         op_stack.push_back(s);
-      } else {
-        // Get the last operator
-        char o1 = s;
-        char o2 = op_stack.back();
-
-        while (precedence(o2) <= precedence(o1) and !op_stack.empty()) {
-          out += o2;
-          op_stack.pop_back();
-          o2 = op_stack.back();
+      } else if (s == ')') {
+        if (op_stack.empty()) {
+          throw std::runtime_error("Unbalanced parentheses");
         }
-        op_stack.push_back(s);
+
+        // While the back is not a parens, add stuff to the operator queue
+        char back = op_stack.back();
+        while (back != '(') {
+          out += back;
+          out += ' ';
+
+          op_stack.pop_back();
+          back = op_stack.back();
+        }
+
+        // We *should* have an left parenthesis on the back
+        if (back == '(') {
+          op_stack.pop_back();
+        } else {
+          throw std::runtime_error("Unbalanced parentheses");
+        }
+      } else if (s == '+' or s == '-' or s == '*' or s == '/') {
+        // If the stack is empty, just push it straight on
+        if (op_stack.empty()) {
+          op_stack.push_back(s);
+        } else {
+          // Get the last operator
+          char o1 = s;
+          char o2 = op_stack.back();
+
+          while (precedence(o2) <= precedence(o1)) {
+            // Add spaces around operators for clarity
+            out += o2;
+            out += ' ';
+
+            op_stack.pop_back();
+            if (op_stack.empty()) {
+              break;
+            } else {
+              o2 = op_stack.back();
+            }
+          }
+          op_stack.push_back(s);
+        }
       }
     }
+
+    // Set the previous iterate and increment
+    s_prev = *it;
+    ++it;
   }
 
   // Push the remaining operators from the queue
   while (!op_stack.empty()) {
+    out += ' ';
     out += op_stack.back();
     op_stack.pop_back();
   }
-  std::cout << out << std::endl;
+
+  // Remove the last character if it is a space
+  if (out.back() == ' ') {
+    out.pop_back();
+  }
 
   return out;
 }

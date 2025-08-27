@@ -36,28 +36,41 @@ TEST_CASE("Operator precedence", "[shunting-yard]") {
   REQUIRE(shunt::parse("7+8/2") == "7 8 2 / +");
 }
 
-// TEST_CASE("Multiple operators", "[shunting-yard]") {
-//   REQUIRE(shunt::parse("1+2+3") == "12+3+");
-//   REQUIRE(shunt::parse("8-5+2") == "85-2+");
-//   REQUIRE(shunt::parse("2*3*4") == "23*4*");
-//   REQUIRE(shunt::parse("9/3/1") == "93/1/");
-// }
+TEST_CASE("Function support in shunting yard", "[parse][functions]") {
+  REQUIRE(shunt::parse("sin(0)") == "0 sin");
+  REQUIRE(shunt::parse("cos(1)") == "1 cos");
+  REQUIRE(shunt::parse("exp(2)") == "2 exp");
+  REQUIRE(shunt::parse("sin(1+2)") == "1 2 + sin");
+  REQUIRE(shunt::parse("cos(1)*2") == "1 cos 2 *");
+  REQUIRE(shunt::parse("sin(1)+cos(2)") == "1sin2cos+");
+  REQUIRE(shunt::parse("exp(1+sin(2))") == "12sin+exp");
+  REQUIRE(shunt::parse("sin(cos(0))") == "0cossin");
+  REQUIRE(shunt::parse("sin(1+2)*3") == "12+sin3*");
+  REQUIRE(shunt::parse("sin(1+2*3)") == "123*+sin");
+}
 
-// TEST_CASE("Parentheses", "[shunting-yard]") {
-//   REQUIRE(shunt::parse("(1+2)*3") == "12+3*");
-//   REQUIRE(shunt::parse("4*(5+6)") == "456+*");
-//   REQUIRE(shunt::parse("7*(8/2)") == "782/*");
-//   REQUIRE(shunt::parse("(1+2)*(3+4)") == "12+34+*");
-// }
+TEST_CASE("Multiple operators", "[shunting-yard]") {
+  REQUIRE(shunt::parse("1+2+3") == "1 2 + 3 +");
+  REQUIRE(shunt::parse("8-5+2") == "8 5 - 2 +");
+  REQUIRE(shunt::parse("2*3*4") == "2 3 * 4 *");
+  REQUIRE(shunt::parse("9/3/1") == "9 3 / 1 /");
+}
 
-// TEST_CASE("Nested parentheses", "[shunting-yard]") {
-//   REQUIRE(shunt::parse("((1+2)*3)-4") == "12+3*4-");
-//   REQUIRE(shunt::parse("5+(6*(7+8))") == "5678+*+");
-//   REQUIRE(shunt::parse("((1+2)+(3+4))*5") == "12+34++5*");
-// }
+TEST_CASE("Nested parentheses", "[shunting-yard]") {
+  REQUIRE(shunt::parse("((1+2)*3)-4") == "1 2 + 3 * 4 -");
+  REQUIRE(shunt::parse("5+(6*(7+8))") == "5 6 7 8 + * +");
+  REQUIRE(shunt::parse("((1+2)+(3+4))*5") == "1 2 + 3 4 + + 5 *");
+}
 
-// TEST_CASE("Complex expressions", "[shunting-yard]") {
-//   REQUIRE(shunt::parse("1+2*3-4/5") == "123*45/-+");
-//   REQUIRE(shunt::parse("1+2*3/4-5") == "123*4/+5-");
-//   REQUIRE(shunt::parse("9-(3+4)*2") == "934+2*-");
-// }
+TEST_CASE("Parentheses", "[shunting-yard]") {
+  REQUIRE(shunt::parse("(1+2)*3") == "1 2 + 3 *");
+  REQUIRE(shunt::parse("4*(5+6)") == "4 5 6 + *");
+  REQUIRE(shunt::parse("7*(8/2)") == "7 8 2 / *");
+  REQUIRE(shunt::parse("(1+2)*(3+4)") == "1 2 + 3 4 + *");
+}
+
+TEST_CASE("Complex expressions", "[shunting-yard]") {
+  REQUIRE(shunt::parse("1+2*3-4/5") == "1 2 3 * 4 5 / - +");
+  REQUIRE(shunt::parse("1+2*3/4-5") == "1 2 3 * 4 / + 5 -");
+  REQUIRE(shunt::parse("9-(3+4)*2") == "9 3 4 + 2 * - ");
+}

@@ -2,7 +2,6 @@
 #define SHUNT_HPP
 
 #include <cctype>
-#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -20,16 +19,15 @@ inline int precedence(std::string o) {
 }
 } // namespace
 
+// Parse expressions of integers e.g. 1 + 2 * 5 / 2
+// TODO: allow for functions
+// TODO: allow for decimal points
+// TODO: check for bad characters
+// TODO: allow for evaluating variables from the heap
 namespace shunt {
 inline std::string parse(std::string expr) {
-  // Parse expressions of integers e.g. 1 + 2 * 5 / 2
-  // TODO: allow for functions
-  // TODO: allow for decimal points
-  // TODO: check for bad characters
-  // TODO: allow for evaluating variables from the heap
-  int n = expr.length();
-  std::string out;
   std::vector<std::string> op_stack;
+  std::vector<std::string> out;
 
   auto it = expr.begin();
   char s_prev = ' ';
@@ -38,17 +36,16 @@ inline std::string parse(std::string expr) {
     // Get the current character
     // If it's a number, just push onto the output
     if (std::isdigit(s)) {
-      out += s;
+      std::string num;
+      while (std::isdigit(s)) {
+        num += s;
+        s_prev = s;
 
-      // Increment the pointer
-      s_prev = s;
-      ++it;
-    } else {
-      // Add a space after every contiguous sequence of numbers
-      if (std::isdigit(s_prev)) {
-        out += ' ';
+        ++it;
+        s = *it;
       }
-
+      out.push_back(num);
+    } else {
       // If alphabet character then it is a function
       if (std::isalpha(s)) {
         // Build the function operator
@@ -78,8 +75,7 @@ inline std::string parse(std::string expr) {
         // While the back is not a parens, add stuff to the operator queue
         std::string back = op_stack.back();
         while (back != "(") {
-          out += back;
-          out += ' ';
+          out.push_back(back);
 
           op_stack.pop_back();
           back = op_stack.back();
@@ -106,8 +102,7 @@ inline std::string parse(std::string expr) {
 
           while (precedence(o2) <= precedence(o1)) {
             // Add spaces around operators for clarity
-            out += o2;
-            out += ' ';
+            out.push_back(o2);
 
             op_stack.pop_back();
             if (op_stack.empty()) {
@@ -128,17 +123,19 @@ inline std::string parse(std::string expr) {
 
   // Push the remaining operators from the queue
   while (!op_stack.empty()) {
-    out += ' ';
-    out += op_stack.back();
+    out.push_back(op_stack.back());
     op_stack.pop_back();
   }
 
-  // Remove the last character if it is a space
-  if (out.back() == ' ') {
-    out.pop_back();
+  // Concatenate the results into a string, with spaces around each
+  std::string out_string{};
+  for (auto it = out.begin(); it != out.end(); ++it) {
+    out_string += *it;
+    if ((it + 1) != out.end()) {
+      out_string += " ";
+    }
   }
-
-  return out;
+  return out_string;
 }
 } // namespace shunt
 

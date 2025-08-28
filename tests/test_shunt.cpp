@@ -70,7 +70,7 @@ TEST_CASE("Parentheses", "[shunting-yard]") {
 }
 
 TEST_CASE("Complex expressions", "[shunting-yard]") {
-  REQUIRE(shunt::parse("1+2*3-4/5") == "1 2 3 * 4 5 / - +");
+  REQUIRE(shunt::parse("1+2*3-4/5") == "1 2 3 * + 4 5 / -");
   REQUIRE(shunt::parse("1+2*3/4-5") == "1 2 3 * 4 / + 5 -");
   REQUIRE(shunt::parse("9-(3+4)*2") == "9 3 4 + 2 * - ");
 }

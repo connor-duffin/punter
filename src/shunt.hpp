@@ -46,7 +46,6 @@ inline std::string parse(std::string expr) {
     } else {
       // Add a space after every contiguous sequence of numbers
       if (std::isdigit(s_prev)) {
-        std::cout << "Adding space!" << std::endl;
         out += ' ';
       }
 

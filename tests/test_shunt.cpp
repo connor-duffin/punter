@@ -45,11 +45,11 @@ TEST_CASE("Basic function support in shunting yard", "[parse][functions]") {
 }
 
 TEST_CASE("Nested function support", "[parse]") {
-  REQUIRE(shunt::parse("cos(1)*2") == "2 1 cos *");
-  REQUIRE(shunt::parse("exp(1+sin(2))") == "12sin+exp");
-  REQUIRE(shunt::parse("sin(cos(0))") == "0cossin");
-  REQUIRE(shunt::parse("sin(1+2)*3") == "12+sin3*");
-  REQUIRE(shunt::parse("sin(1+2*3)") == "123*+sin");
+  REQUIRE(shunt::parse("cos(1)*2") == "1 cos 2 *");
+  REQUIRE(shunt::parse("exp(1+sin(2))") == "1 2 sin + exp");
+  REQUIRE(shunt::parse("sin(cos(0))") == "0 cos sin");
+  REQUIRE(shunt::parse("sin(1+2)*3") == "1 2 + sin 3 *");
+  REQUIRE(shunt::parse("sin(1+2*3)") == "1 2 3 * + sin");
 }
 
 TEST_CASE("Multiple operators", "[parse]") {

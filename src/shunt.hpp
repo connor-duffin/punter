@@ -2,6 +2,7 @@
 #define SHUNT_HPP
 
 #include <cctype>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -15,6 +16,14 @@ inline int precedence(std::string o) {
     return 3;
   } else {
     return 1'000'000;
+  }
+}
+
+inline bool is_fun(std::string f) {
+  if (f == "sin" || f == "cos" || f == "exp") {
+    return true;
+  } else {
+    return false;
   }
 }
 } // namespace
@@ -58,7 +67,6 @@ inline std::string parse(std::string expr) {
           s = *it;
         }
 
-        // Push function operator onto the stack
         op_stack.push_back(fun);
       } else if (s == '(') {
         // Cast to a string and go next
@@ -76,7 +84,6 @@ inline std::string parse(std::string expr) {
         std::string back = op_stack.back();
         while (back != "(") {
           out.push_back(back);
-
           op_stack.pop_back();
           back = op_stack.back();
         }
@@ -87,6 +94,13 @@ inline std::string parse(std::string expr) {
         } else {
           throw std::runtime_error("Unbalanced parentheses");
         }
+
+	// Finally if there is a function left over, pop it
+	back = op_stack.back();
+        if (is_fun(back)) {
+          out.push_back(back);
+          op_stack.pop_back();
+	}
 
         // Increment the pointer
         s_prev = s;

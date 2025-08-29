@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(shunt-header-only LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
 
 # Make sure we export the compile commands for Emacs
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

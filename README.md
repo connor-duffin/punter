@@ -17,7 +17,7 @@ Currently only supported are integers, the operators `* / - +`, parentheses, and
 
 ## Build and test
 
-We use [CMake](https://cmake.org/cmake/help/latest/index.html) to build and test the project. Strictly speaking, building is not needed as it is header-only, however it will at least run the tests.
+We use [CMake](https://cmake.org/cmake/help/latest/index.html) to build and test the project, with tests via [Catch2](https://github.com/catchorg/Catch2). Strictly speaking, building is not needed as it is header-only, however it will at least run the tests.
 
 To build and test the project (from the `build` directory):
 

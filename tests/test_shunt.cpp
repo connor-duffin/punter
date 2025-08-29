@@ -44,6 +44,12 @@ TEST_CASE("Basic function support in shunting yard", "[parse][functions]") {
   REQUIRE(shunt::parse("sin(1)+cos(2)") == "1 sin 2 cos +");
 }
 
+TEST_CASE("Inverse function support", "[parse]") {
+  REQUIRE(shunt::parse("asin(0)") == "0 asin");
+  REQUIRE(shunt::parse("acos(1)") == "1 acos");
+  REQUIRE(shunt::parse("log(2)") == "2 log");
+}
+
 TEST_CASE("Nested function support", "[parse]") {
   REQUIRE(shunt::parse("cos(1)*2") == "1 cos 2 *");
   REQUIRE(shunt::parse("exp(1+sin(2))") == "1 2 sin + exp");
@@ -59,10 +65,10 @@ TEST_CASE("Multiple operators", "[parse]") {
   REQUIRE(shunt::parse("9/3/1") == "9 3 / 1 /");
 }
 
-TEST_CASE("Nested parentheses", "[parse]") {
-  REQUIRE(shunt::parse("((1+2)*3)-4") == "1 2 + 3 * 4 -");
-  REQUIRE(shunt::parse("5+(6*(7+8))") == "5 6 7 8 + * +");
-  REQUIRE(shunt::parse("((1+2)+(3+4))*5") == "1 2 + 3 4 + + 5 *");
+TEST_CASE("Complex expressions", "[parse]") {
+  REQUIRE(shunt::parse("1+2*3-4/5") == "1 2 3 * + 4 5 / -");
+  REQUIRE(shunt::parse("1+2*3/4-5") == "1 2 3 * 4 / + 5 -");
+  REQUIRE(shunt::parse("9-(3+4)*2") == "9 3 4 + 2 * -");
 }
 
 TEST_CASE("Parentheses", "[parse]") {
@@ -72,8 +78,9 @@ TEST_CASE("Parentheses", "[parse]") {
   REQUIRE(shunt::parse("(1+2)*(3+4)") == "1 2 + 3 4 + *");
 }
 
-TEST_CASE("Complex expressions", "[parse]") {
-  REQUIRE(shunt::parse("1+2*3-4/5") == "1 2 3 * + 4 5 / -");
-  REQUIRE(shunt::parse("1+2*3/4-5") == "1 2 3 * 4 / + 5 -");
-  REQUIRE(shunt::parse("9-(3+4)*2") == "9 3 4 + 2 * -");
+TEST_CASE("Nested parentheses", "[parse]") {
+  REQUIRE(shunt::parse("((1+2)*3)-4") == "1 2 + 3 * 4 -");
+  REQUIRE(shunt::parse("5+(6*(7+8))") == "5 6 7 8 + * +");
+  REQUIRE(shunt::parse("((1+2)+(3+4))*5") == "1 2 + 3 4 + + 5 *");
 }
+

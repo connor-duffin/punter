@@ -5,11 +5,21 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
-// Does operator o1 have equal to or higher precedence than o2
-namespace {
-inline int precedence(std::string o) {
+
+static std::unordered_set<std::string> KNOWN_FUNCTIONS{
+  "sin", "cos", "tan", "asin", "acos", "atan", "cosh", "sinh", "tanh", "acosh",
+  "asinh", "atanh", "exp", "log", "ceil", "floor", "round"
+};
+
+// Parse expressions of integers e.g. 1 + 2 * 5 / 2
+// TODO: allow for decimal points
+// TODO: check for bad characters
+// TODO: allow for evaluating variables from the heap
+namespace shunt {
+inline int precedence(const std::string &o) {
   if (o == "+" or o == "-") {
     return 4;
   } else if (o == "*" or o == "/") {
@@ -19,22 +29,15 @@ inline int precedence(std::string o) {
   }
 }
 
-inline bool is_fun(std::string f) {
-  if (f == "sin" || f == "cos" || f == "exp") {
+inline bool is_fun(const std::string &f) {
+  if (KNOWN_FUNCTIONS.count(f)) {
     return true;
   } else {
     return false;
   }
 }
-} // namespace
 
-// Parse expressions of integers e.g. 1 + 2 * 5 / 2
-// TODO: allow for functions
-// TODO: allow for decimal points
-// TODO: check for bad characters
-// TODO: allow for evaluating variables from the heap
-namespace shunt {
-inline std::string parse(std::string expr) {
+inline std::string parse(const std::string &expr) {
   std::vector<std::string> op_stack;
   std::vector<std::string> out;
 
@@ -42,6 +45,7 @@ inline std::string parse(std::string expr) {
   char s_prev = ' ';
   while (it != expr.end()) {
     char s = *it;
+
     // Get the current character
     // If it's a number, just push onto the output
     if (std::isdigit(s)) {
@@ -51,7 +55,8 @@ inline std::string parse(std::string expr) {
         s_prev = s;
 
         ++it;
-        s = *it;
+	if (it == expr.end()) break;
+	s = *it;
       }
       out.push_back(num);
     } else {
@@ -64,10 +69,15 @@ inline std::string parse(std::string expr) {
           s_prev = s;
 
           ++it;
-          s = *it;
+	  if (it == expr.end()) break;
+	  s = *it;
         }
 
-        op_stack.push_back(fun);
+	if (is_fun(fun)) {
+          op_stack.push_back(fun);
+        } else {
+	  throw std::runtime_error("Provided function not recognised");
+	}
       } else if (s == '(') {
         // Cast to a string and go next
         op_stack.push_back(std::string(1, s));
@@ -88,7 +98,7 @@ inline std::string parse(std::string expr) {
           back = op_stack.back();
         }
 
-        // We *should* have an left parenthesis on the back
+        // We *should* have a left parenthesis on the back
         if (back == "(") {
           op_stack.pop_back();
         } else {
@@ -106,6 +116,7 @@ inline std::string parse(std::string expr) {
         s_prev = s;
         ++it;
       } else if (s == '+' or s == '-' or s == '*' or s == '/') {
+
         // If the stack is empty, just push it straight on
         if (op_stack.empty()) {
           op_stack.push_back(std::string(1, s));

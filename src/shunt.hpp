@@ -2,22 +2,17 @@
 #define SHUNT_HPP
 
 #include <cctype>
-#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <unordered_set>
 #include <vector>
 
-
-static std::unordered_set<std::string> KNOWN_FUNCTIONS{
+// Use inline variable so it this variable is not copied across different files
+inline const std::unordered_set<std::string> KNOWN_FUNCTIONS{
   "sin", "cos", "tan", "asin", "acos", "atan", "cosh", "sinh", "tanh", "acosh",
   "asinh", "atanh", "exp", "log", "ceil", "floor", "round"
 };
 
-// Parse expressions of integers e.g. 1 + 2 * 5 / 2
-// TODO: allow for decimal points
-// TODO: check for bad characters
-// TODO: allow for evaluating variables from the heap
 namespace shunt {
 inline int precedence(const std::string &o) {
   if (o == "+" or o == "-") {
@@ -37,6 +32,7 @@ inline bool is_fun(const std::string &f) {
   }
 }
 
+// Parse expressions of integers e.g. (1 + 2) * 5 / 2 into a string
 inline std::string parse(const std::string &expr) {
   std::vector<std::string> op_stack;
   std::vector<std::string> out;

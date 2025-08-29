@@ -8,14 +8,16 @@ For example:
 
 ```cpp
 #include "shunt.hpp"
-using namespace std;
 
-string postfix = shunt::parse("3 + 3 + 5 / 200")  // returns "33+5200/+"
+std::string expr = "3 + 3 + 5 / 200";
+std::string rpn = shunt::parse(expr)  // rpn == "3 3 + 5 200 / +"
 ```
+
+Currently only supported are integers, the operators `* / - +`, parentheses, and some simple functions (`sin`, `cos`, `exp`, etc).
 
 ## Build and test
 
-We use [CMake](https://cmake.org/cmake/help/latest/index.html) to build and test the project. Strictly speaking, building is not needed as it is header-only.
+We use [CMake](https://cmake.org/cmake/help/latest/index.html) to build and test the project. Strictly speaking, building is not needed as it is header-only, however it will at least run the tests.
 
 To build and test the project (from the `build` directory):
 
@@ -24,3 +26,9 @@ cmake ..
 cmake --build .
 ctest --verbose
 ```
+
+## Licence
+
+MIT - Copyright Connor Duffin.
+
+

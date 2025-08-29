@@ -7,13 +7,22 @@
 #include <unordered_set>
 #include <vector>
 
-// Use inline variable so it this variable is not copied across different files
+/**
+ * A constant of the known functions in this repo - use inline variable so it
+ * this variable is not copied across different files.
+ */
 inline const std::unordered_set<std::string> KNOWN_FUNCTIONS{
   "sin", "cos", "tan", "asin", "acos", "atan", "cosh", "sinh", "tanh", "acosh",
   "asinh", "atanh", "exp", "log", "ceil", "floor", "round"
 };
 
 namespace shunt {
+/**
+ * @brief Fetch the precedence of the operator, defined from here:
+ * https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages
+ * @param o The string containing the operator to be parsed.
+ * @return The value of the operator precedence.
+ */
 inline int precedence(const std::string &o) {
   if (o == "+" or o == "-") {
     return 4;
@@ -24,6 +33,11 @@ inline int precedence(const std::string &o) {
   }
 }
 
+/**
+ * @brief Helper function to check if the provided string is a function.
+ * @param f A function.
+ * @return True if a function, false otherwise.
+ */
 inline bool is_fun(const std::string &f) {
   if (KNOWN_FUNCTIONS.count(f)) {
     return true;
@@ -32,7 +46,15 @@ inline bool is_fun(const std::string &f) {
   }
 }
 
-// Parse expressions of integers e.g. (1 + 2) * 5 / 2 into a string
+/**
+ * @brief Parse basic mathematical expressions of integers into
+ * postfix/reverse-Polish notation.
+ *
+ * Currently supports only integers, (* / + -), and some basic functions.
+ *
+ * @param expr A mathematical expression.
+ * @return A string giving the RPN representation of the expression.
+ */
 inline std::string parse(const std::string &expr) {
   std::vector<std::string> op_stack;
   std::vector<std::string> out;
